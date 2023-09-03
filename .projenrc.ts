@@ -15,7 +15,11 @@ const project = new typescript.TypeScriptProject({
   bugsUrl: "https://github.com/libreworks/container/issues",
 
   tsconfig: {
-    compilerOptions: { module: "node16", lib: ["ES2022"], target: "es2022" },
+    compilerOptions: {
+      module: "node16",
+      lib: ["DOM", "ES2022"],
+      target: "es2022",
+    },
   },
   prettier: true,
   codeCov: true,
@@ -42,7 +46,7 @@ const project = new typescript.TypeScriptProject({
     },
   },
 
-  // deps: [],                /* Runtime dependencies of this module. */
+  deps: ["ts-log", "pino"] /* Runtime dependencies of this module. */,
   // devDeps: [],             /* Build dependencies for this module. */
 });
 project.synth();

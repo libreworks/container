@@ -53,6 +53,10 @@
     "typedoc": "^0.25.0",
     "typescript": "^5.2.2"
   },
+  "dependencies": {
+    "pino": "^8.15.0",
+    "ts-log": "^2.2.5"
+  },
   "main": "lib/index.js",
   "license": "Apache-2.0",
   "homepage": "https://libreworks.github.io/container/",
