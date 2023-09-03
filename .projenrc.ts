@@ -3,6 +3,7 @@ import { typescript, javascript } from "projen";
 const project = new typescript.TypeScriptProject({
   name: "container",
   description: "A simple dependency injection container and event publisher",
+  license: "MIT",
   packageName: "@libreworks/container",
   projenrcTs: true,
 

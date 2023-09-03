@@ -58,7 +58,7 @@
     "ts-log": "^2.2.5"
   },
   "main": "lib/index.js",
-  "license": "Apache-2.0",
+  "license": "MIT",
   "homepage": "https://libreworks.github.io/container/",
   "version": "0.0.0",
   "bugs": {
