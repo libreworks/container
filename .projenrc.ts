@@ -2,19 +2,29 @@ import { typescript, javascript } from "projen";
 
 const project = new typescript.TypeScriptProject({
   name: "container",
-  description: "A simple dependency injection container and event publisher",
-  license: "MIT",
-  packageName: "@libreworks/container",
-  projenrcTs: true,
+  description: "A simple dependency injection container and event target",
+  keywords: [
+    "dependency injection",
+    "di",
+    "ioc",
+    "inversion-of-control",
+    "service locator",
+    "EventTarget",
+  ],
 
   authorName: "LibreWorks Contributors",
-  authorUrl: "https://github.com/libreworks/shady-island/contributors",
+  authorUrl: "https://github.com/libreworks/container/contributors",
   authorOrganization: true,
+  license: "MIT",
 
   repository: "https://github.com/libreworks/container.git",
   homepage: "https://libreworks.github.io/container/",
   bugsUrl: "https://github.com/libreworks/container/issues",
 
+  deps: ["ts-log"],
+
+  minNodeVersion: "18.0.0",
+  workflowNodeVersion: "18.x",
   tsconfig: {
     compilerOptions: {
       module: "node16",
@@ -22,6 +32,8 @@ const project = new typescript.TypeScriptProject({
       target: "es2022",
     },
   },
+
+  projenrcTs: true,
   prettier: true,
   codeCov: true,
   docgen: true,
@@ -30,9 +42,7 @@ const project = new typescript.TypeScriptProject({
   defaultReleaseBranch: "main",
   githubOptions: {
     pullRequestLintOptions: {
-      semanticTitleOptions: {
-        types: ["feat", "fix", "chore", "docs"],
-      },
+      semanticTitleOptions: { types: ["feat", "fix", "chore", "docs"] },
     },
   },
   projenTokenSecret: "PROJEN_GITHUB_TOKEN",
@@ -47,7 +57,7 @@ const project = new typescript.TypeScriptProject({
     },
   },
 
-  deps: ["ts-log", "pino"] /* Runtime dependencies of this module. */,
-  // devDeps: [],             /* Build dependencies for this module. */
+  releaseToNpm: true,
+  packageName: "@libreworks/container",
 });
 project.synth();
