@@ -60,4 +60,7 @@ const project = new typescript.TypeScriptProject({
   releaseToNpm: true,
   packageName: "@libreworks/container",
 });
+
+project.package.file.addOverride("private", false);
+
 project.synth();
