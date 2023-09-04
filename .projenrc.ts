@@ -59,6 +59,8 @@ const project = new typescript.TypeScriptProject({
 
   releaseToNpm: true,
   packageName: "@libreworks/container",
+  npmAccess: javascript.NpmAccess.PUBLIC,
+  npmignore: ["docs"],
 });
 
 project.package.file.addOverride("private", false);

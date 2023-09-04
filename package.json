@@ -70,6 +70,9 @@
   "main": "lib/index.js",
   "license": "MIT",
   "homepage": "https://libreworks.github.io/container/",
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "0.0.0",
   "bugs": {
     "url": "https://github.com/libreworks/container/issues"
