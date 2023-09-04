@@ -6,7 +6,7 @@
     },
     {
       "name": "@types/node",
-      "version": "^16",
+      "version": "^18",
       "type": "build"
     },
     {
@@ -86,10 +86,6 @@
     {
       "name": "typescript",
       "type": "build"
-    },
-    {
-      "name": "pino",
-      "type": "runtime"
     },
     {
       "name": "ts-log",
