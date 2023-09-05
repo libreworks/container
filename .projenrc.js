@@ -22,21 +22,37 @@ const project = new typescript.TypeScriptProject({
   bugsUrl: "https://github.com/libreworks/container/issues",
 
   deps: ["ts-log"],
+  devDeps: ["@jest/globals"],
 
   minNodeVersion: "18.0.0",
   workflowNodeVersion: "18.x",
   tsconfig: {
     compilerOptions: {
+      moduleResolution: javascript.TypeScriptModuleResolution.NODE16,
       module: "node16",
       lib: ["DOM", "ES2022"],
       target: "es2022",
     },
   },
 
-  projenrcTs: true,
   prettier: true,
   codeCov: true,
   docgen: true,
+
+  jestOptions: {
+    jestConfig: {
+      extensionsToTreatAsEsm: [".ts"],
+      moduleNameMapper: {
+        "^(\\.{1,2}/.*)\\.js$": "$1",
+      },
+      transform: {
+        "^.+\\.ts$": [
+          "ts-jest",
+          { useESM: true, tsconfig: "tsconfig.dev.json" },
+        ],
+      },
+    },
+  },
 
   majorVersion: 0,
   defaultReleaseBranch: "main",
@@ -63,6 +79,8 @@ const project = new typescript.TypeScriptProject({
   npmignore: ["docs"],
 });
 
+project.package.file.addOverride("type", "module");
 project.package.file.addOverride("private", false);
+project.testTask.env("NODE_OPTIONS", "--experimental-vm-modules");
 
 project.synth();
