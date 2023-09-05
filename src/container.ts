@@ -1,10 +1,5 @@
-import { dummyLogger, Logger } from "ts-log";
-import { measureTime, LOGGER, PROVIDERS } from "./util.js";
-
-const NAME = Symbol("name");
-const TAGS = Symbol("tags");
-const FACTORY = Symbol("factory");
-const INSTANCE = Symbol("instance");
+import type { Logger } from "ts-log";
+import { measureTime, nullLogger } from "./util.js";
 
 /**
  * A function that provides a value.
@@ -15,76 +10,73 @@ export type Factory<V> = (container: Container) => V;
  * A named object that provides a value.
  */
 export class Provider<T = any> {
-  private readonly [LOGGER]: Logger;
-  private readonly [NAME]: string;
-  private readonly [FACTORY]: Factory<T>;
-  private readonly [TAGS]: Set<string>;
-  private [INSTANCE]?: Promise<T>;
+  readonly #logger: Logger;
+  readonly #name: string;
+  readonly #factory: Factory<T>;
+  readonly #tags: Set<string>;
+  #instance?: Promise<T>;
 
   /**
    * Creates a new Provider.
    *
-   * @param {string} name - The name of the component.
-   * @param {Function} factory - A function that returns the component.
-   * @param {string[]} [tags=[]] - An array of string tags for the component.
-   * @param {winston.Logger} [logger] - The winston logger.
+   * @param name - The name of the component.
+   * @param factory - A function that returns the component.
+   * @param tags - An optional array of string tags for the component.
+   * @param logger - The logger instance.
    */
   public constructor(
     name: string,
     factory: Factory<T>,
     tags: string[] = [],
-    logger: Logger = dummyLogger,
+    logger: Logger = nullLogger,
   ) {
-    this[NAME] = name;
-    this[FACTORY] = factory;
-    this[TAGS] = new Set(tags);
-    this[LOGGER] = logger;
+    this.#name = name;
+    this.#factory = factory;
+    this.#tags = new Set(tags);
+    this.#logger = logger;
   }
 
   /**
-   * @returns {string} The component name.
+   * @returns The component name.
    */
   public get name(): string {
-    return this[NAME];
+    return this.#name;
   }
 
   /**
-   * @returns {Set<string>} The tags for the component.
+   * @returns The tags for the component.
    */
   public get tags(): Set<string> {
-    return this[TAGS];
+    return this.#tags;
   }
 
   /**
    * Instantiates the component.
    *
-   * @param {Container} container - The container object.
-   * @returns {any} the component as produced by the factory function.
-   * @throws {Error} if a circular dependency is detected.
+   * @param container - The container object.
+   * @returns the component as produced by the factory function.
    */
   public async provide(container: Container): Promise<T> {
-    if (this[INSTANCE] === undefined) {
-      this[LOGGER].debug(`Instantiating component: ${this[NAME]}`);
-      this[INSTANCE] = measureTime(
-        () => this[FACTORY](container),
-        this[LOGGER],
-        `Component instantiated: ${this[NAME]}`,
+    if (this.#instance === undefined) {
+      this.#logger.debug(`Instantiating component: ${this.#name}`);
+      this.#instance = measureTime(
+        () => this.#factory(container),
+        this.#logger,
+        `Component instantiated: ${this.#name}`,
       );
-      return this[INSTANCE];
+      return this.#instance;
     }
-    return this[INSTANCE];
+    return this.#instance;
   }
 }
-
-const BYTAG = Symbol("byTag");
 
 /**
  * A simplistic asynchronous dependency injection container.
  */
 export class Container extends EventTarget {
-  protected readonly [LOGGER]: Logger;
-  private readonly [PROVIDERS]: Map<string, Provider<unknown>>;
-  private readonly [BYTAG]: Map<string, Set<Provider<unknown>>>;
+  readonly #logger: Logger;
+  readonly #providers: Map<string, Provider<unknown>>;
+  readonly #bytag: Map<string, Set<Provider<unknown>>>;
 
   /**
    * Create a new Container.
@@ -94,10 +86,14 @@ export class Container extends EventTarget {
    */
   public constructor(
     providers: Map<string, Provider<unknown>>,
-    logger: Logger = dummyLogger,
+    logger: Logger = nullLogger,
   ) {
     super();
-    this[PROVIDERS] = new Map(providers);
+    this.#logger = logger;
+
+    this.#providers = new Map(providers);
+    this.#logger.trace(`Number of value providers: ${providers.size}`);
+
     const byTag = new Map();
     for (let provider of providers.values()) {
       for (let tag of provider.tags) {
@@ -107,33 +103,33 @@ export class Container extends EventTarget {
         byTag.get(tag).add(provider);
       }
     }
-    this[BYTAG] = byTag;
-    this[LOGGER] = logger;
+    this.#bytag = byTag;
+    this.#logger.trace(`Number of tags: ${providers.size}`);
   }
 
   /**
    * Gets a named component from the container.
    *
-   * @param {string} name - The component name.
+   * @param name - The component name.
    * @throws {RangeError} if no component is registered with the provided name.
-   * @return {any} The registered component
+   * @returns A promise that resolves to the registered component
    */
   public async get<T = any>(name: string): Promise<T> {
-    if (!this[PROVIDERS].has(name)) {
+    if (!this.#providers.has(name)) {
       throw new RangeError(
         `No component is registered under the name '${name}'`,
       );
     }
-    const provider = this[PROVIDERS].get(name) as Provider<T>;
+    const provider = this.#providers.get(name) as Provider<T>;
     return provider.provide(this);
   }
 
   /**
    * Gets multiple named components from the container.
    *
-   * @param {string[]} names - The component names.
+   * @param names - The component names.
    * @throws {RangeError} if no component is registered with one of the provided names.
-   * @return {Array} The registered components
+   * @returns A Promise that resolves to the registered components
    */
   public getAll<T = any>(
     names: Iterable<string> | ArrayLike<string>,
@@ -148,24 +144,24 @@ export class Container extends EventTarget {
   /**
    * Gets any components registered under a specific tag.
    *
-   * @param {string} tag - The tag.
-   * @returns {Array} Any components found.
+   * @param tag - The tag.
+   * @returns A Promise that resolves to the tagged components.
    */
   public getAllTagged<T = any>(tag: string): Promise<T[]> {
-    if (!this[BYTAG].has(tag)) {
+    if (!this.#bytag.has(tag)) {
       return Promise.resolve([]);
     }
-    const providers = this[BYTAG].get(tag)! as Set<Provider<T>>;
+    const providers = this.#bytag.get(tag)! as Set<Provider<T>>;
     return Promise.all(Array.from(providers, (p) => p.provide(this)));
   }
 
   /**
    * Gets the names of all registered components.
    *
-   * @returns {string[]} The registered component names.
+   * @returns The registered component names.
    */
   public getNames(): string[] {
-    return Array.from(this[PROVIDERS].keys());
+    return Array.from(this.#providers.keys());
   }
 
   /**
@@ -174,10 +170,10 @@ export class Container extends EventTarget {
    * If this method returns `true`, invoking `get` with the same parameter will
    * not throw a `RangeError`.
    *
-   * @param {string} name - The component name.
-   * @returns {boolean} Whether the component exists in the container
+   * @param name - The component name.
+   * @returns Whether the component exists in the container
    */
   public has(name: string): boolean {
-    return this[PROVIDERS].has(name);
+    return this.#providers.has(name);
   }
 }

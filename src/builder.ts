@@ -1,35 +1,33 @@
-import { dummyLogger, Logger } from "ts-log";
+import { Logger } from "ts-log";
 import { Container, Factory, Provider } from "./container.js";
-import { measureTime, LOGGER, PROVIDERS } from "./util.js";
-
-const EAGER = Symbol("eager");
+import { measureTime, nullLogger } from "./util.js";
 
 /**
  * Assembles configuration for a dependency injection container.
  */
 export class Builder {
-  private readonly [LOGGER]: Logger;
-  private readonly [PROVIDERS]: Map<string, Provider<unknown>>;
-  private readonly [EAGER]: Set<string>;
+  readonly #logger: Logger;
+  readonly #providers: Map<string, Provider<unknown>>;
+  readonly #eager: Set<string>;
 
   /**
    * Creates a new Builder.
    *
    * @param logger - The logger instance.
    */
-  constructor(logger: Logger = dummyLogger) {
-    this[LOGGER] = logger;
-    this[PROVIDERS] = new Map();
-    this[EAGER] = new Set();
+  constructor(logger: Logger = nullLogger) {
+    this.#logger = logger;
+    this.#providers = new Map();
+    this.#eager = new Set();
   }
 
   /**
    * Abandons registered components and resets the builder to a default state.
    */
   reset() {
-    this[PROVIDERS].clear();
-    this[EAGER].clear();
-    this[LOGGER].debug("The container builder is now in the default state");
+    this.#providers.clear();
+    this.#eager.clear();
+    this.#logger.debug("The container builder is now in the default state");
   }
 
   /**
@@ -39,7 +37,7 @@ export class Builder {
    * @return Whether the component factory is present.
    */
   has(name: string): boolean {
-    return this[PROVIDERS].has(name);
+    return this.#providers.has(name);
   }
 
   /**
@@ -52,20 +50,20 @@ export class Builder {
    * tags with special meanings:
    * - `@eager` - The component will be instantiated when the container is built.
    *
-   * @param {string} name - The name of the component.
-   * @param {Function} factory - A function that returns the component.
-   * @param {string[]} [tags=[]] - An array of string tags for the component.
-   * @return {Builder} provides a fluent interface.
+   * @param name - The name of the component.
+   * @param factory - A function that returns the component.
+   * @param tags - An optional array of string tags for the component.
+   * @returns provides a fluent interface.
    */
   public register<T>(
     name: string,
     factory: Factory<T>,
     tags: string[] = [],
   ): this {
-    const provider = new Provider(name, factory, tags, this[LOGGER]);
-    this[PROVIDERS].set(name, provider);
+    const provider = new Provider(name, factory, tags, this.#logger);
+    this.#providers.set(name, provider);
     if (provider.tags.has("@eager")) {
-      this[EAGER].add(name);
+      this.#eager.add(name);
     }
     return this;
   }
@@ -73,14 +71,14 @@ export class Builder {
   /**
    * Registers a constant value as a component.
    *
-   * @param {string} [name] - The name of the component.
-   * @param {any} [value] - The static value to register as the component.
-   * @return {Builder} provides a fluent interface.
+   * @param name - The name of the component.
+   * @param value - The static value to register as the component.
+   * @returns provides a fluent interface.
    */
   public constant<T>(name: string, value: T): this {
-    this[PROVIDERS].set(
+    this.#providers.set(
       name,
-      new Provider(name, () => value, [], this[LOGGER]),
+      new Provider(name, () => value, [], this.#logger),
     );
     return this;
   }
@@ -88,18 +86,20 @@ export class Builder {
   /**
    * Builds a new container and resets the builder to a default state.
    *
-   * @return {Container} The container.
+   * @returns The Promised container.
    */
   public async build(): Promise<Container> {
-    this[LOGGER].info(
-      `Building a dependency injection container with ${this[PROVIDERS].size} components`,
+    this.#logger.info(
+      `Building a dependency injection container with ${
+        this.#providers.size
+      } components`,
     );
-    const container = new Container(this[PROVIDERS]);
-    if (this[EAGER].size > 0) {
-      this[LOGGER].info(`Instantiating eager components: ${this[EAGER]}`);
+    const container = new Container(this.#providers);
+    if (this.#eager.size > 0) {
+      this.#logger.info(`Instantiating eager components: ${this.#eager}`);
       await measureTime(
-        () => container.getAll(this[EAGER]),
-        this[LOGGER],
+        () => container.getAll(this.#eager),
+        this.#logger,
         "Instantiated eager components",
       );
     }

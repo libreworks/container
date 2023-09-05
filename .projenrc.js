@@ -32,6 +32,7 @@ const project = new typescript.TypeScriptProject({
       module: "node16",
       lib: ["DOM", "ES2022"],
       target: "es2022",
+      removeComments: true,
     },
   },
 

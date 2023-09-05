@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
-import { Builder } from "../lib/builder.js";
-import { Container } from "../lib/container.js";
+import { Builder } from "../src/builder.js";
+import { Container } from "../src/container.js";
 
 describe("Builder", () => {
   describe("#construct", () => {

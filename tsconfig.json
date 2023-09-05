@@ -27,7 +27,8 @@
     "strictPropertyInitialization": true,
     "stripInternal": true,
     "target": "es2022",
-    "moduleResolution": "node16"
+    "moduleResolution": "node16",
+    "removeComments": true
   },
   "include": [
     "src/**/*.ts"
