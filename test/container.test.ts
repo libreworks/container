@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { Container, Provider } from "../lib/container.js";
 
 describe("Provider", () => {

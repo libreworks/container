@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { measureTime } from "../lib/util.js";
 
 describe("#measureTime", () => {

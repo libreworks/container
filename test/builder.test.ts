@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { Builder } from "../lib/builder.js";
 import { Container } from "../lib/container.js";
 
