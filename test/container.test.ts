@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { Container, Provider } from "../lib/container.js";
+import { Container, Provider } from "../src/container.js";
 
 describe("Provider", () => {
   describe("#construct", () => {
