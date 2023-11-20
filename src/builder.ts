@@ -90,9 +90,7 @@ export class Builder {
    */
   public async build(): Promise<Container> {
     this.#logger.info(
-      `Building a dependency injection container with ${
-        this.#providers.size
-      } components`,
+      `Building a dependency injection container with ${this.#providers.size} components`,
     );
     const container = new Container(this.#providers);
     if (this.#eager.size > 0) {
