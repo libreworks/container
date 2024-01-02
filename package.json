@@ -46,10 +46,10 @@
     "jest": "^29.7.0",
     "jest-junit": "^15",
     "prettier": "^3.1.1",
-    "projen": "^0.78.2",
+    "projen": "^0.78.6",
     "standard-version": "^9",
     "ts-jest": "^29.1.1",
-    "typedoc": "^0.25.4",
+    "typedoc": "^0.25.6",
     "typescript": "^5.3.3"
   },
   "dependencies": {
@@ -83,15 +83,6 @@
     "moduleNameMapper": {
       "^(\\.{1,2}/.*)\\.js$": "$1"
     },
-    "transform": {
-      "^.+\\.ts$": [
-        "ts-jest",
-        {
-          "useESM": true,
-          "tsconfig": "tsconfig.dev.json"
-        }
-      ]
-    },
     "testMatch": [
       "<rootDir>/src/**/__tests__/**/*.ts?(x)",
       "<rootDir>/(test|src)/**/*(*.)@(spec|test).ts?(x)"
@@ -124,11 +115,15 @@
         }
       ]
     ],
-    "preset": "ts-jest",
-    "globals": {
-      "ts-jest": {
-        "tsconfig": "tsconfig.dev.json"
-      }
+    "transform": {
+      "^.+\\.ts$": [
+        "ts-jest",
+        {
+          "tsconfig": "tsconfig.dev.json",
+          "useEsm": true,
+          "useESM": true
+        }
+      ]
     }
   },
   "types": "lib/index.d.ts",
