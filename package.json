@@ -49,8 +49,8 @@
     "projen": "^0.82.8",
     "standard-version": "^9",
     "ts-jest": "^29.1.5",
-    "typedoc": "^0.26.1",
-    "typescript": "^5.4.5"
+    "typedoc": "^0.26.3",
+    "typescript": "^5.5.2"
   },
   "dependencies": {
     "ts-log": "^2.2.5"
