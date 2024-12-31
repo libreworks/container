@@ -1,4 +1,4 @@
-import { typescript, javascript } from "projen";
+import { typescript, github, javascript, ReleasableCommits } from "projen";
 
 const project = new typescript.TypeScriptProject({
   name: "container",
@@ -60,11 +60,11 @@ const project = new typescript.TypeScriptProject({
   majorVersion: 0,
   defaultReleaseBranch: "main",
   githubOptions: {
+    projenCredentials: github.GithubCredentials.fromApp({}),
     pullRequestLintOptions: {
       semanticTitleOptions: { types: ["feat", "fix", "chore", "docs"] },
     },
   },
-  projenTokenSecret: "PROJEN_GITHUB_TOKEN",
   autoApproveOptions: {
     // Anyone with write access to this repository can have auto-approval.
     allowedUsernames: [],
@@ -76,6 +76,7 @@ const project = new typescript.TypeScriptProject({
     },
   },
 
+  releasableCommits: ReleasableCommits.featuresAndFixes(),
   releaseToNpm: true,
   packageName: "@libreworks/container",
   npmAccess: javascript.NpmAccess.PUBLIC,
