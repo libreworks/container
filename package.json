@@ -48,9 +48,9 @@
     "jest-junit": "^16",
     "prettier": "^3.5.3",
     "projen": "^0.91.20",
-    "ts-jest": "^29.3.1",
+    "ts-jest": "^29.3.2",
     "tsx": "^4.19.3",
-    "typedoc": "^0.28.1",
+    "typedoc": "^0.28.2",
     "typescript": "^5.8.3"
   },
   "dependencies": {
