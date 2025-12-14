@@ -78,6 +78,7 @@ const project = new typescript.TypeScriptProject({
 
   releasableCommits: ReleasableCommits.featuresAndFixes(),
   releaseToNpm: true,
+  npmTrustedPublishing: true,
   packageName: "@libreworks/container",
   npmAccess: javascript.NpmAccess.PUBLIC,
   npmignore: ["docs"],
