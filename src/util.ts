@@ -5,7 +5,7 @@ import type { Logger } from "ts-log";
  * Logs the amount of time a function takes to execute.
  */
 export async function measureTime<T>(
-  fn: () => T,
+  fn: () => T | Promise<T>,
   logger: Logger,
   message: string,
 ): Promise<T> {

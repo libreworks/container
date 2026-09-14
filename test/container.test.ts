@@ -31,6 +31,25 @@ describe("Provider", () => {
       actual = await obj.provide(container);
       expect(actual).toBe(component);
     });
+
+    test("failed components always throw", async () => {
+      const container = new Container(new Map());
+      const name = "foobar";
+      const factory = jest.fn(async () => {
+        throw new Error("Failure");
+      });
+      const tags = ["a", "b", "c"];
+      const obj = new Provider(name, factory, tags);
+      const expected = { name: "Error", message: "Failure" };
+      await expect(async () => obj.provide(container)).rejects.toMatchObject(
+        expected,
+      );
+      // do it again to check the caching behavior.
+      await expect(async () => obj.provide(container)).rejects.toMatchObject(
+        expected,
+      );
+      expect(factory).toHaveBeenCalledTimes(1);
+    });
   });
 });
 

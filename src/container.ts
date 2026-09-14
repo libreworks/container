@@ -4,7 +4,7 @@ import { measureTime, nullLogger } from "./util.js";
 /**
  * A function that provides a value.
  */
-export type Factory<V> = (container: Container) => V;
+export type Factory<V> = (container: Container) => V | Promise<V>;
 
 /**
  * A named object that provides a value.
@@ -47,11 +47,14 @@ export class Provider<T = any> {
    * @returns The tags for the component.
    */
   public get tags(): Set<string> {
-    return this.#tags;
+    return new Set(this.#tags);
   }
 
   /**
    * Instantiates the component.
+   *
+   * If the factory function itself throws an Error or a rejected promise, this
+   * result is cached and the factory will not be invoked a second time.
    *
    * @param container - The container object.
    * @returns the component as produced by the factory function.
@@ -64,7 +67,6 @@ export class Provider<T = any> {
         this.#logger,
         `Component instantiated: ${this.#name}`,
       );
-      return this.#instance;
     }
     return this.#instance;
   }
@@ -104,7 +106,7 @@ export class Container extends EventTarget {
       }
     }
     this.#bytag = byTag;
-    this.#logger.trace(`Number of tags: ${providers.size}`);
+    this.#logger.trace(`Number of tags: ${byTag.size}`);
   }
 
   /**

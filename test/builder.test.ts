@@ -2,6 +2,14 @@ import { jest } from "@jest/globals";
 import { Builder } from "../src/builder.js";
 import { Container } from "../src/container.js";
 
+class Foo {
+  constructor() {}
+
+  public whatever() {
+    return "bar";
+  }
+}
+
 describe("Builder", () => {
   describe("#construct", () => {
     test("should create an empty container", async () => {
@@ -46,6 +54,15 @@ describe("Builder", () => {
       expect(actual).toBe(value);
     });
 
+    test("allows async factory", async () => {
+      const name = "barfoo";
+      const obj = new Builder();
+      obj.register<Foo>(name, async () => new Foo());
+      const container = await obj.build();
+      const actual = await container.get(name);
+      expect(actual).toBeInstanceOf(Foo);
+    });
+
     test("should register an eager factory", async () => {
       const name = "foobar";
       const value = new Set([123, 456]);
@@ -81,6 +98,19 @@ describe("Builder", () => {
       const obj = new Builder();
       const resetStub = jest.spyOn(obj, "reset");
       await obj.build();
+      expect(resetStub).toHaveBeenCalledTimes(1);
+    });
+
+    test("should call reset even for failed eager component", async () => {
+      const obj = new Builder();
+      const resetStub = jest.spyOn(obj, "reset");
+      const name = "foobar";
+      obj.register(name, () => {
+        throw new Error("Failed");
+      }, ["@eager"]);
+      try {
+        await obj.build();
+      } catch {}
       expect(resetStub).toHaveBeenCalledTimes(1);
     });
   });
