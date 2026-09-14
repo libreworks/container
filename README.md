@@ -2,7 +2,7 @@
 
 [![MIT](https://img.shields.io/github/license/libreworks/container)](https://github.com/libreworks/container/blob/main/LICENSE)
 [![npm](https://img.shields.io/npm/v/@libreworks/container)](https://www.npmjs.com/package/@libreworks/container)
-[![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/libreworks/container/release/main?label=release)](https://github.com/libreworks/container/actions/workflows/release.yml)
+[![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/libreworks/container/release.yml?branch=main&label=release)](https://github.com/libreworks/container/actions/workflows/release.yml)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/libreworks/container?sort=semver)](https://github.com/libreworks/container/releases)
 [![codecov](https://codecov.io/gh/libreworks/container/branch/main/graph/badge.svg?token=OHTRGNTSPO)](https://codecov.io/gh/libreworks/container)
 
