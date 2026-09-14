@@ -94,3 +94,51 @@ const builder = new Builder().register("FooBar", () => new Thingy(), [
 const container = await builder.build();
 // Thingy has already been instantiated.
 ```
+
+Eager component creation is especially useful for event listeners.
+
+```typescript
+class OrderPlaced extends Event {
+  static readonly TYPE = "order.placed";
+  constructor(readonly orderId: string) {
+    super(OrderPlaced.TYPE);
+  }
+}
+
+class OrderService {
+  constructor(private readonly events: EventTarget) {}
+  placeOrder(orderId: string) {
+    this.events.dispatchEvent(new OrderPlaced(orderId));
+  }
+}
+
+class AuditLog {
+  readonly entries: string[] = [];
+}
+
+const builder = new Builder();
+
+builder.register(
+  "audit",
+  (c) => {
+    const audit = new AuditLog();
+    c.addEventListener(OrderPlaced.TYPE, (e) => {
+      if (e instanceof OrderPlaced) {
+        audit.entries.push(e.orderId);
+      }
+    });
+    return audit;
+  },
+  ["@eager"]
+);
+
+builder.register("orders", (c) => new OrderService(c));
+
+const container = await builder.build();
+
+const orders = await container.get<OrderService>("orders");
+orders.placeOrder("A-1");
+
+const audit = await container.get<AuditLog>("audit");
+console.log(audit.entries); // [ 'A-1' ]
+```
