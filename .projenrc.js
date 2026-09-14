@@ -1,5 +1,7 @@
 import { typescript, github, javascript, ReleasableCommits } from "projen";
 
+const repositoryUrl = "https://github.com/libreworks/container";
+
 const project = new typescript.TypeScriptProject({
   name: "container",
   description: "A simple dependency injection container and event target",
@@ -13,19 +15,19 @@ const project = new typescript.TypeScriptProject({
   ],
 
   authorName: "LibreWorks Contributors",
-  authorUrl: "https://github.com/libreworks/container/contributors",
+  authorUrl: `${repositoryUrl}/contributors`,
   authorOrganization: true,
   license: "MIT",
 
-  repository: "https://github.com/libreworks/container.git",
+  repository: `${repositoryUrl}.git`,
   homepage: "https://libreworks.github.io/container/",
-  bugsUrl: "https://github.com/libreworks/container/issues",
+  bugsUrl: `${repositoryUrl}/issues`,
 
   deps: ["ts-log"],
   devDeps: ["@jest/globals", "tsx"],
 
   minNodeVersion: "18.0.0",
-  workflowNodeVersion: "22",
+  workflowNodeVersion: "24",
   tsconfig: {
     compilerOptions: {
       moduleResolution: javascript.TypeScriptModuleResolution.NODE16,

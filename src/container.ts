@@ -116,7 +116,7 @@ export class Container extends EventTarget {
    * @throws {RangeError} if no component is registered with the provided name.
    * @returns A promise that resolves to the registered component
    */
-  public async get<T = any>(name: string): Promise<T> {
+  public async get<T = unknown>(name: string): Promise<T> {
     if (!this.#providers.has(name)) {
       throw new RangeError(
         `No component is registered under the name '${name}'`,
@@ -133,14 +133,14 @@ export class Container extends EventTarget {
    * @throws {RangeError} if no component is registered with one of the provided names.
    * @returns A Promise that resolves to the registered components
    */
-  public getAll<T = any>(
+  public getAll<T = unknown>(
     names: Iterable<string> | ArrayLike<string>,
   ): Promise<T[]> {
     const namesList = Array.from(names);
     if (namesList.length === 0) {
       return Promise.resolve([]);
     }
-    return Promise.all(namesList.map((name) => this.get(name)));
+    return Promise.all(namesList.map((name) => this.get<T>(name)));
   }
 
   /**
@@ -149,7 +149,7 @@ export class Container extends EventTarget {
    * @param tag - The tag.
    * @returns A Promise that resolves to the tagged components.
    */
-  public getAllTagged<T = any>(tag: string): Promise<T[]> {
+  public getAllTagged<T = unknown>(tag: string): Promise<T[]> {
     if (!this.#bytag.has(tag)) {
       return Promise.resolve([]);
     }
