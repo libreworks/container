@@ -24,7 +24,7 @@ export class Builder {
   /**
    * Abandons registered components and resets the builder to a default state.
    */
-  reset() {
+  public reset() {
     this.#providers.clear();
     this.#eager.clear();
     this.#logger.debug("The container builder is now in the default state");
@@ -36,7 +36,7 @@ export class Builder {
    * @param name - The component name to check.
    * @return Whether the component factory is present.
    */
-  has(name: string): boolean {
+  public has(name: string): boolean {
     return this.#providers.has(name);
   }
 
@@ -90,18 +90,25 @@ export class Builder {
    */
   public async build(): Promise<Container> {
     this.#logger.info(
-      `Building a dependency injection container with ${this.#providers.size} components`,
+      `Building a dependency injection container with ${
+        this.#providers.size
+      } components`,
     );
     const container = new Container(this.#providers);
-    if (this.#eager.size > 0) {
-      this.#logger.info(`Instantiating eager components: ${this.#eager}`);
-      await measureTime(
-        () => container.getAll(this.#eager),
-        this.#logger,
-        "Instantiated eager components",
-      );
+    try {
+      if (this.#eager.size > 0) {
+        this.#logger.info(
+          `Instantiating eager components: ${[...this.#eager]}`,
+        );
+        await measureTime(
+          () => container.getAll(this.#eager),
+          this.#logger,
+          "Instantiated eager components",
+        );
+      }
+    } finally {
+      this.reset();
     }
-    this.reset();
     return container;
   }
 }

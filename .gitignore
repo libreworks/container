@@ -47,7 +47,7 @@ codecov.*
 !/.prettierrc.json
 !/test/
 !/tsconfig.json
-!/tsconfig.dev.json
+!/test/tsconfig.json
 !/src/
 /lib
 /dist/
