@@ -9,7 +9,7 @@ export type Factory<V> = (container: Container) => V | Promise<V>;
 /**
  * A named object that provides a value.
  */
-export class Provider<T = any> {
+export class Provider<T = unknown> {
   readonly #logger: Logger;
   readonly #name: string;
   readonly #factory: Factory<T>;

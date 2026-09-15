@@ -17,7 +17,7 @@ npm install @libreworks/container
 This library conforms to ECMAScript Modules (ESM). You can import this module using ESM or TypeScript syntax.
 
 ```TypeScript
-import { Builder, Container, Producer } from "@libreworks/container";
+import { Builder, Container, Provider } from "@libreworks/container";
 ```
 
 If you're using CommonJS, you must use [dynamic imports](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import) instead.
@@ -114,23 +114,18 @@ class OrderService {
 
 class AuditLog {
   readonly entries: string[] = [];
+  constructor(events: EventTarget) {
+    events.addEventListener(OrderPlaced.TYPE, (e) => {
+      if (e instanceof OrderPlaced) {
+        this.entries.push(e.orderId);
+      }
+    });
+  }
 }
 
 const builder = new Builder();
 
-builder.register(
-  "audit",
-  (c) => {
-    const audit = new AuditLog();
-    c.addEventListener(OrderPlaced.TYPE, (e) => {
-      if (e instanceof OrderPlaced) {
-        audit.entries.push(e.orderId);
-      }
-    });
-    return audit;
-  },
-  ["@eager"]
-);
+builder.register("audit", (c) => new AuditLog(c), ["@eager"]);
 
 builder.register("orders", (c) => new OrderService(c));
 
